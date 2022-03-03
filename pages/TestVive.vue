@@ -224,8 +224,16 @@ export default {
           Atktest: this.Atktest,
           age: this.age,
           fullname: this.fname + ' ' + this.lname,
+          
         })
-
+        this.date = ''
+        this.email = ''
+        this.phone = ''
+        this.Atktest = ''
+        this.age = ''
+        this.fname = ''
+        this.lname = ''
+        this.checkin = ''
         console.log('Document written with ID: ', docRef.id)
         this.readData()
       } catch (e) {
