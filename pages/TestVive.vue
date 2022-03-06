@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-5 py-2">
-    <div class=" text-5xl px-3 font-bold text-blue-900 my-5">
+    <div class="text-5xl px-3 font-bold text-blue-900 my-5">
       Covid <span class="text-pink-700"> Registration</span>
     </div>
     <form ref="aaaa" @submit.prevent="addData">
@@ -15,7 +15,7 @@
           <input
             v-model="fname"
             type="text"
-            class="block p-2.5 w-full text-blue-900     bg-gray-50 rounded-lg border-2 border-yellow-500 sm:text-xs focus:outline-none"
+            class="block p-2.5 w-full text-blue-900 bg-gray-50 rounded-lg border-2 border-yellow-500 sm:text-xs focus:outline-none"
             placeholder="Your name"
             required
           />
@@ -29,7 +29,7 @@
           <input
             v-model="lname"
             type="text"
-            class="block p-2.5 w-full text-blue-900     bg-gray-50 rounded-lg border-2 border-yellow-500 sm:text-xs focus:outline-none"
+            class="block p-2.5 w-full text-blue-900 bg-gray-50 rounded-lg border-2 border-yellow-500 sm:text-xs focus:outline-none"
             placeholder="Your last name"
             required
           />
@@ -46,7 +46,7 @@
             min="1"
             max="120"
             type="number"
-            class="block p-2.5 w-full text-blue-900     bg-gray-50 rounded-lg border-2 border-yellow-500 sm:text-xs focus:outline-none"
+            class="block p-2.5 w-full text-blue-900 bg-gray-50 rounded-lg border-2 border-yellow-500 sm:text-xs focus:outline-none"
             placeholder="Your age"
             required
           />
@@ -100,7 +100,7 @@
                 width="16"
                 height="16"
                 fill="currentColor"
-                class="bi bi-telephone  text-yellow-600"
+                class="bi bi-telephone text-yellow-600"
                 viewBox="0 0 16 16"
               >
                 <path
@@ -149,7 +149,7 @@
               datepicker
               datepicker-autohide
               type="text"
-              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm     bg-gray-50 rounded-lg  focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2"
+              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm bg-gray-50 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2"
               placeholder="Select date"
             />
           </VueTailwindPicker>
@@ -163,10 +163,9 @@
           <select
             v-model="Atktest"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            
             required
           >
-          <option value="" disabled selected>Select your test results</option>
+            <option value="" disabled selected>Select your test results</option>
             <option>Negative</option>
             <option>Positive</option>
           </select>
@@ -179,6 +178,7 @@
             Submit
           </button>
         </div>
+        {{ x }}
       </div>
     </form>
 
@@ -187,7 +187,15 @@
 </template>
 
 <script>
-import { addDoc, collection, getDocs } from 'firebase/firestore'
+import {
+  addDoc,
+  collection,
+  query,
+  onSnapshot,
+  orderBy,
+  serverTimestamp
+} from 'firebase/firestore'
+
 import Vue from 'vue'
 import VueTailwindPicker from 'vue-tailwind-picker'
 import db from '../plugin/index.js'
@@ -208,6 +216,7 @@ export default {
       Atktest: '',
       age: '',
       checkin: '',
+      x: '',
     }
   },
   mounted() {
@@ -224,7 +233,7 @@ export default {
           Atktest: this.Atktest,
           age: this.age,
           fullname: this.fname + ' ' + this.lname,
-          
+          timestamp: serverTimestamp()
         })
         this.date = ''
         this.email = ''
@@ -235,19 +244,30 @@ export default {
         this.lname = ''
         this.checkin = ''
         console.log('Document written with ID: ', docRef.id)
-        this.readData()
+        // this.readData()
       } catch (e) {
         console.error('Error adding document: ', e)
       }
     },
-    async readData() {
-      this.csDoc = []
-      const querySnapshot = await getDocs(collection(db, 'csmju'))
-      querySnapshot.forEach((doc) => {
-        console.log(`${doc.id} => ${doc.data()}`)
-        this.csDoc.push({ id: doc.id, data: doc.data() })
+    readData() {
+      // this.csDoc = []
+      // const querySnapshot = await getDocs(collection(db, 'csmju'))
+      // querySnapshot.forEach((doc) => {
+
+      //   console.log(`${doc.id} => ${doc.data()}`)
+      //   this.csDoc.push({ id: doc.id, data: doc.data() })
+      // })
+
+      const q = query(collection(db, 'csmju'),orderBy("date", "asc"))
+      onSnapshot(q, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          // console.log(doc.data());
+          this.csDoc.push({ id: doc.id, data: doc.data() })
+        })
+        // console.log('Current cities in CA: ', cities.join(', '))
       })
     },
+
   },
 }
 </script>
